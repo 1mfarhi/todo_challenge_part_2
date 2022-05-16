@@ -1,4 +1,5 @@
 from tkinter import NONE
+from venv import create
 from xml.etree.ElementTree import Comment
 from django import forms
 
@@ -15,10 +16,10 @@ class TaskForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['description'].label = 'Add Task'
 
-    class TagForm(forms.ModelForm):
-        class Meta:
-            model = Tag
-            fields = ['name']
+class TagForm(forms.ModelForm):
+    class Meta:
+        model = Tag
+        fields = ['name']
 
     def __init__(self, *args, **kwargs):
         self.task = kwargs.pop('task', NONE)
@@ -31,8 +32,7 @@ class TaskForm(forms.ModelForm):
         # usually, calling <form>.save() will try to create a new instance of the model.
         # In this case, a tag with the given name might already exist. Use get_or_create()
         # to only create one if it does not already exit
-        tag, created = Tag.objects.get_or_create
-        (name == self.data['name'])
+        tag, create = Tag.objects.get_or_create(name = self.data['name'])
 
         # Automatically add this tag to the task, whether it is now or not.
         self.task.tags.add(tag)
@@ -40,11 +40,11 @@ class TaskForm(forms.ModelForm):
 class CommentForm(forms.ModelForm):
     class Meta:
         model = Comment
-        fields = ['comment']        
+        fields = ['body']
     
     def __init__(self, *args, **kwargs):
         task = kwargs.pop('task')
         super().__init__(*args, **kwargs)
         self.instance.task = task
-        self.fields['comment'].label = ''
+        self.fields['body'].label = ''
 
