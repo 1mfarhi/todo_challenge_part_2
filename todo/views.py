@@ -2,10 +2,14 @@ from django.shortcuts import render, redirect
 
 from django.views import View
 
-from todo.forms import TaskForm, CommentForm
-from todo.models import Task, Comment
+from todo.forms import TaskForm, CommentForm, TagForm
+from todo.models import Task, Comment, Tag
+#from django import forms
 
 # Create your views here.
+
+def home(request):
+    return render(request, 'main/index.html')
 
 class TodoListView(View):
     def get(self, request):
@@ -34,31 +38,45 @@ class TodoDetailView(View):
         task = Task.objects.get(id=task_id)
         task_form = TaskForm(instance=task)
 
-        comment_form = CommentForm(task=task)
         comments = Comment.objects.filter(task=task).order_by('created_at')
-        print(comments)
-
+        comment_form = CommentForm(task=task)
+        #print(comments)
+        tags = Tag.objects.filter(task=task)
+        tag_form = TagForm(task=task)
+        print(tags)
 
         return render(
             request=request,
             template_name='detail.html',
-            context={'task_form': task_form, 'id': task_id, 'comments': comments, 'comment_form': comment_form}
+            context={'task_form': task_form, 'id': task_id, 'comments': comments, 'comment_form': comment_form, 'tag_form': tag_form, 'tags':tags},
         )
 
     def post(self, request, task_id):
         '''Update or delete the specific task based on what the user submitted in the form'''
         task = Task.objects.get(id=task_id)
 
-        if 'save' in request.POST:
+        if 'save_task' in request.POST:
             task_form = TaskForm(request.POST, instance=task)
             task_form.save()
 
-        elif 'delete' in request.POST:
+        elif 'delete_task' in request.POST:
             task.delete()
+ 
+        elif 'save_comment' in request.POST:
+            comment_form = CommentForm(request.POST, task=task)
+            comment_form.save()
 
-        elif 'add' in request.POST:
-            form = CommentForm(request.POST, task=task)
-            form.save()
+            return redirect('task', task_id=task.id)
+
+        elif 'add_tag' in request.POST:
+            tag_form = TagForm(request.POST, task=task)
+            # if tag_form.is_valid():
+            tag_form.save()
+            
 
         # "redirect" to the todo homepage
+            return redirect('task', task_id=task.id)
+
         return redirect('todo_list')
+
+

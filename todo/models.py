@@ -20,7 +20,7 @@ class Task(models.Model):
 
 
 class Comment(models.Model):
-    comment = models.TextField()
+    body = models.TextField()
     # foreign key from comments table,
     # on_delete deletes comments associated with deleted task
     task = models.ForeignKey(Task, on_delete=models.CASCADE)

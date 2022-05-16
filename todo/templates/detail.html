@@ -14,19 +14,27 @@
 <form action=""{% url 'task' id %}" method="POST"> 
     {% csrf_token %} 
     {{ tag_form }} 
-    <input type="submit" name="add_tag" value="Tag" 
+    <input type="submit" name="add_tag" value="Tag">
+    
+
 </form>
 
     {% for tag in tags %}
         <span> {{ tag.name }} | </span>
     {% endfor %} 
 
-    <hr>
-    <h3><Comments</h3>
+<hr>
+<h3>Comments</h3>
+
+<form action="{% url 'task' id %}" method="POST">
+    {% csrf_token %}
+    {{ comment_form }}
+    <input type="submit" name="save_comment" value="Add" />
+</form>
 
 <ul>
     {% for comment in comments %}
-        <li> {{ comment.comment }}    </li>
+        <li> {{ comment.body }}    </li>
     {% endfor %}
 </ul>
 
